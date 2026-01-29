@@ -6,13 +6,21 @@ const OrderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
+        enum: ['pending', 'approved', 'rejected', 'completed'],
+        default: 'pending',
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Supplier',
-        required: true
+        default: null
     }
-});
+},
+{ timestamps: true }
+);
 
 module.exports = mongoose.model("Order", OrderSchema);

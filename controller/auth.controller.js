@@ -54,29 +54,37 @@ const register = async (req, res) => {
     }
 };
 
-
+// Login an existing user
 const login = async (req, res) => {
     try {
+        // 1. Extract email and password from request body
         const { email, password } = req.body;
-
+        
+        // 2. Basic validation
         if(!email || !password) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
+        // 3. Check if user exists
         const user = await User.findOne({ email });
         if(!user) {
             return res.status(400).json({ message: 'User does not exist' });
         }
+
+        // 4. Validate password
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if(!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
+
+        // 5. Create JWT token
         const token = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
+        // 6. Send response
         res.status(200).json({
             message: 'Login successful',
             token,
@@ -92,6 +100,8 @@ const login = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+// Export the controller functions
 module.exports = {
   register,
   login
